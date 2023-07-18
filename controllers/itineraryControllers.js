@@ -55,11 +55,12 @@ const itineraryControllers = {
     },
 
     addOneItinerary: async (req, res) => {
-        const { nameItinerary, creatorName, creatorPhoto, unitPrice, duration, hastags, likes} = req.body.data;
+        const { cityId, nameItinerary, creatorName, creatorPhoto, unitPrice, duration, hastags, likes, description} = req.body.data;
         try {
             const verifyItineraryExist = await Itinerary.find({ nameItinerary: { $regex: nameItinerary, $options: 'i' } });
             if (verifyItineraryExist.length === 0) {
                 const newItinerary = await new Itinerary({
+                    cityId: cityId,
                     nameItinerary: nameItinerary,
                     creatorName: creatorName,
                     creatorPhoto: creatorPhoto,
@@ -67,6 +68,7 @@ const itineraryControllers = {
                     duration: duration,
                     hastags: hastags,
                     likes: likes,
+                    description: description,
                 }).save();
                 res.json({
                     response: newItinerary,
@@ -98,12 +100,14 @@ const itineraryControllers = {
                 if (verifyItineraryExist.length == 0) {
                     let dataItinerary = {
                         nameItinerary: itinerary.nameItinerary,
+                        cityId: itinerary.cityId,
                         creatorName: itinerary.creatorName,
                         creatorPhoto: itinerary.creatorPhoto,
                         unitPrice: itinerary.unitPrice,
                         duration: itinerary.duration,
                         hastags: itinerary.hastags,
                         likes: itinerary.likes,
+                        description: itinerary.description,
                     };
                     await new Itinerary({ ...dataItinerary }).save();
                     itinerary.push(dataItinerary);
