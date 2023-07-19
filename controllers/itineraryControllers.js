@@ -129,8 +129,49 @@ const itineraryControllers = {
             error: error
         });
     },
-    removeItinerary:() =>{},
-    removeManyItineraries:() =>{},
+    removeItinerary: async (req, res) => {
+        const id = req.params.id
+        let itinerary
+        let error = null
+
+        try {
+            itinerary = await Itinerary.findOneAndDelete({ _id: id })
+            itinerary ? error = null : error = "The Itinerary to delete was not found"
+        } catch (err) { error = err }
+
+        res.json({
+            response: error ? "ERROR" : itinerary,
+            success: error ? false : true,
+            error: error
+        })
+    },
+
+    removeManyItineraries: async (req, res) => {
+        const data = req.body.data
+        let itinerariesDelete = []
+        let error = []
+
+        for (let id of data) {
+            try {
+                let itinerary
+                itinerary = await Itinerary.findOneAndDelete({ _id: id })
+                if (itinerary) {
+                    itinerariesDelete.push(itinerary)
+                } else {
+                    error.push({
+                        id: id,
+                        error: "The itinerary to delete was not found"
+                    })
+                }
+
+            } catch (err) { error.push({ err }) }
+        }
+        res.json({
+            response: error.length > 0 && itinerariesDelete.lenght === 0 ? "ERROR" : itinerariesDelete,
+            success: error.length > 0 ? (itinerariesDelete.length > 0 ? "warning" : false) : true,
+            error: error
+        })
+    }
 };
 
 module.exports = itineraryControllers;
